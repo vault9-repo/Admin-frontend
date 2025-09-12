@@ -2,40 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PrimePicks Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - PrimePicks</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body style="background: url('./images/background.PNG') no-repeat center center/cover;">
-
-  <!-- ===== LOGIN FORM ===== -->
-  <div id="login-form" class="card">
-    <h2>🔑 Admin Login</h2>
-    <form>
-      <input type="password" id="password" placeholder="Enter Admin Password" required />
-      <button type="submit">Login</button>
-    </form>
+<body>
+  <div class="container">
+    <div class="login-box">
+      <h1>PrimePicks Admin Login</h1>
+      <form id="loginForm">
+        <input type="password" id="password" placeholder="Enter Admin Password" required />
+        <button type="submit">Login</button>
+      </form>
+      <p id="error" class="error"></p>
+    </div>
   </div>
 
-  <!-- ===== ADMIN PANEL ===== -->
-  <div id="admin-panel" class="card" style="display:none;">
-    <h2>📊 Manage Predictions</h2>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    <!-- Add Bet Form -->
-    <form id="bet-form">
-      <input type="date" id="date" required />
-      <input type="time" id="time" required />
-      <input type="text" id="match" placeholder="Match (Team A vs Team B)" required />
-      <input type="text" id="prediction" placeholder="Prediction (e.g., Over 2.5)" required />
-      <input type="text" id="odds" placeholder="Odds (e.g., 1.95)" required />
-      <button type="submit">➕ Add Prediction</button>
-    </form>
+      const password = document.getElementById("password").value;
 
-    <!-- Bet List -->
-    <h3>📋 Stored Predictions</h3>
-    <ul id="bet-list"></ul>
-  </div>
+      try {
+        const response = await fetch("https://admin-backend-7bsj.onrender.com/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
 
-  <script src="admin.js"></script>
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem("adminLoggedIn", "true");
+          window.location.href = "adminPanel.html"; // redirect to dashboard
+        } else {
+          document.getElementById("error").textContent = data.message || "Login failed";
+        }
+      } catch (err) {
+        console.error("❌ Login error:", err);
+        document.getElementById("error").textContent = "Server error. Try again later.";
+      }
+    });
+  </script>
 </body>
 </html>

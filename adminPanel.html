@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6 text-center">Admin Panel</h1>
+
+    <!-- Add Prediction Form -->
+    <form id="predictionForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input type="text" id="date" placeholder="Date" class="border px-3 py-2 rounded" />
+        <input type="text" id="time" placeholder="Time" class="border px-3 py-2 rounded" />
+        <input type="text" id="match" placeholder="Match" class="border px-3 py-2 rounded" />
+        <input type="text" id="prediction" placeholder="Prediction" class="border px-3 py-2 rounded" />
+        <input type="text" id="odds" placeholder="Odds" class="border px-3 py-2 rounded" />
+      </div>
+      <button
+        type="submit"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Add Prediction
+      </button>
+    </form>
+
+    <!-- Predictions Table -->
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8">
+      <h2 class="text-xl font-bold mb-4">Predictions List</h2>
+      <table class="table-auto w-full text-left" id="predictionsTable">
+        <thead>
+          <tr>
+            <th class="px-4 py-2">Date</th>
+            <th class="px-4 py-2">Time</th>
+            <th class="px-4 py-2">Match</th>
+            <th class="px-4 py-2">Prediction</th>
+            <th class="px-4 py-2">Odds</th>
+            <th class="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Predictions injected by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="admin.js"></script>
+</body>
+</html>
