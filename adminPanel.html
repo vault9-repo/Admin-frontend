@@ -4,38 +4,64 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - PrimePicks</title>
-  <link href="styles.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('background.PNG') no-repeat center center/cover;
+      background-size: cover;
+    }
+    .overlay {
+      background: rgba(255,255,255,0.95);
+    }
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    @media (max-width: 640px) {
+      table thead { display: none; }
+      table tr { display: block; margin-bottom: 1rem; }
+      table td { display: flex; justify-content: space-between; padding: 0.5rem; }
+      table td::before { content: attr(data-label); font-weight: bold; }
+    }
+  </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center justify-start py-6 px-4">
 
-  <div class="overlay max-w-5xl w-full p-6 rounded shadow flex flex-col">
-    <div class="flex justify-between items-center mb-4">
-      <h1>Admin Panel - Predictions</h1>
-      <button id="logoutBtn">Logout</button>
+  <div class="overlay max-w-5xl w-full p-6 rounded shadow">
+    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+      <h1 class="text-2xl font-bold flex-1 text-center sm:text-left">Admin Panel - Predictions</h1>
+      <button id="logoutBtn" class="bg-red-500 text-white p-2 rounded hover:bg-red-600">Logout</button>
     </div>
 
-    <form id="predictionForm">
-      <input type="date" id="date" required>
-      <input type="time" id="time" required>
-      <input type="text" id="match" placeholder="Match" required>
-      <input type="text" id="prediction" placeholder="Prediction" required>
-      <input type="text" id="odds" placeholder="Odds" required>
-      <button type="submit">Add Prediction</button>
+    <!-- Prediction Form -->
+    <form id="predictionForm" class="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-6">
+      <input type="date" id="date" class="border p-2 rounded w-full" required>
+      <input type="time" id="time" class="border p-2 rounded w-full" required>
+      <input type="text" id="match" placeholder="Match" class="border p-2 rounded w-full" required>
+      <input type="text" id="prediction" placeholder="Prediction" class="border p-2 rounded w-full" required>
+      <input type="text" id="odds" placeholder="Odds" class="border p-2 rounded w-full" required>
+      <button type="submit" class="col-span-1 sm:col-span-5 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 mt-2">Add Prediction</button>
     </form>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Match</th>
-          <th>Prediction</th>
-          <th>Odds</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="predictionsTable"></tbody>
-    </table>
+    <!-- Predictions Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full table-auto text-center">
+        <thead>
+          <tr class="bg-gray-200">
+            <th>Date</th>
+            <th>Time</th>
+            <th>Match</th>
+            <th>Prediction</th>
+            <th>Odds</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="predictionsTable"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -44,14 +70,14 @@
     const form = document.getElementById('predictionForm');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    // Redirect if not logged in
+    // Check login
     if (localStorage.getItem('adminLoggedIn') !== 'true') {
-      window.location.href = 'index.html';
+      window.location.href = 'login.html';
     }
 
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('adminLoggedIn');
-      window.location.href = 'index.html';
+      window.location.href = 'login.html';
     });
 
     async function fetchPredictions() {
@@ -60,13 +86,13 @@
         const data = await res.json();
         table.innerHTML = data.map(bet => `
           <tr>
-            <td>${bet.date}</td>
-            <td>${bet.time}</td>
-            <td>${bet.match}</td>
-            <td>${bet.prediction}</td>
-            <td>${bet.odds}</td>
-            <td>
-              <button onclick="deletePrediction('${bet._id}')">Delete</button>
+            <td data-label="Date">${bet.date}</td>
+            <td data-label="Time">${bet.time}</td>
+            <td data-label="Match">${bet.match}</td>
+            <td data-label="Prediction">${bet.prediction}</td>
+            <td data-label="Odds">${bet.odds}</td>
+            <td data-label="Action">
+              <button onclick="deletePrediction('${bet._id}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
             </td>
           </tr>
         `).join('');
