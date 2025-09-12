@@ -6,26 +6,36 @@
   <title>PrimePicks Admin Panel</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body style="background: url('./images/background.PNG') no-repeat center center/cover;">
+<body>
 
   <div class="container">
-    <h1>PrimePicks Admin Panel</h1>
+    <!-- Login Card -->
+    <div id="loginCard" class="card">
+      <h1>Admin Login</h1>
+      <input type="password" id="adminPassword" placeholder="Enter Password">
+      <button id="loginBtn">
+        Login
+        <span id="loader" class="loader hidden"></span>
+      </button>
+      <p id="loginError" class="hidden">Incorrect password!</p>
+    </div>
 
-    <!-- Add Prediction Form -->
-    <form id="predictionForm" class="card">
-      <h2>Add New Prediction</h2>
-      <input type="text" id="date" placeholder="Date (YYYY-MM-DD)" required>
-      <input type="text" id="time" placeholder="Time (HH:MM)" required>
-      <input type="text" id="match" placeholder="Match" required>
-      <input type="text" id="prediction" placeholder="Prediction" required>
-      <input type="text" id="odds" placeholder="Odds" required>
-      <button type="submit">Add Prediction</button>
-    </form>
+    <!-- Admin Panel Card -->
+    <div id="adminCard" class="card hidden">
+      <h1>Admin Panel - Predictions</h1>
 
-    <!-- Bets Table -->
-    <div class="card">
-      <h2>Stored Predictions</h2>
-      <table id="betsTable">
+      <!-- Add Prediction Form -->
+      <form id="predictionForm">
+        <input type="date" id="date" required>
+        <input type="time" id="time" required>
+        <input type="text" id="match" placeholder="Match" required>
+        <input type="text" id="prediction" placeholder="Prediction" required>
+        <input type="text" id="odds" placeholder="Odds" required>
+        <button type="submit">Add Prediction</button>
+      </form>
+
+      <!-- Predictions Table -->
+      <table>
         <thead>
           <tr>
             <th>Date</th>
@@ -36,11 +46,112 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="predictionsTable"></tbody>
       </table>
     </div>
   </div>
 
-  <script src="admin.js"></script>
+  <script>
+    const loginCard = document.getElementById('loginCard');
+    const adminCard = document.getElementById('adminCard');
+    const loginBtn = document.getElementById('loginBtn');
+    const loader = document.getElementById('loader');
+    const loginError = document.getElementById('loginError');
+
+    const apiUrl = 'https://admin-backend-7bsj.onrender.com'; // Replace with your backend URL
+    const table = document.getElementById('predictionsTable');
+    const form = document.getElementById('predictionForm');
+
+    // Login
+    loginBtn.addEventListener('click', async () => {
+      loginError.classList.add('hidden');
+      loader.classList.remove('hidden');
+      loginBtn.disabled = true;
+
+      const password = document.getElementById('adminPassword').value;
+
+      try {
+        const res = await fetch(`${apiUrl}/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          loginBtn.disabled = false;
+
+          if (data.success) {
+            loginCard.classList.add('hidden');
+            adminCard.classList.remove('hidden');
+            fetchPredictions();
+          } else {
+            loginError.classList.remove('hidden');
+          }
+        }, 500);
+      } catch (err) {
+        loader.classList.add('hidden');
+        loginBtn.disabled = false;
+        loginError.textContent = 'Server error, try again!';
+        loginError.classList.remove('hidden');
+      }
+    });
+
+    // Fetch Predictions
+    async function fetchPredictions() {
+      try {
+        const res = await fetch(`${apiUrl}/predictions`);
+        const data = await res.json();
+        table.innerHTML = data.map(bet => `
+          <tr>
+            <td>${bet.date}</td>
+            <td>${bet.time}</td>
+            <td>${bet.match}</td>
+            <td>${bet.prediction}</td>
+            <td>${bet.odds}</td>
+            <td><button class="delete-btn" onclick="deletePrediction('${bet._id}')">Delete</button></td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('❌ Error fetching predictions:', err);
+      }
+    }
+
+    // Add Prediction
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const bet = {
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        match: document.getElementById('match').value,
+        prediction: document.getElementById('prediction').value,
+        odds: document.getElementById('odds').value,
+      };
+
+      try {
+        await fetch(`${apiUrl}/predictions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bet)
+        });
+        form.reset();
+        fetchPredictions();
+      } catch (err) {
+        console.error('❌ Error adding prediction:', err);
+      }
+    });
+
+    // Delete Prediction
+    async function deletePrediction(id) {
+      try {
+        await fetch(`${apiUrl}/predictions/${id}`, { method: 'DELETE' });
+        fetchPredictions();
+      } catch (err) {
+        console.error('❌ Error deleting prediction:', err);
+      }
+    }
+  </script>
+
 </body>
 </html>
