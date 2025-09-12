@@ -4,49 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login - PrimePicks</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: url('background.PNG') no-repeat center center/cover;
-      background-size: cover;
-    }
-    .overlay {
-      background: rgba(255,255,255,0.95);
-    }
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #10B981;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 8px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
-  </style>
+  <link href="styles.css" rel="stylesheet">
 </head>
-<body class="min-h-screen flex items-center justify-center px-4">
+<body>
 
-  <div class="overlay rounded shadow max-w-sm w-full text-center p-0">
-    <div class="bg-green-500 text-white py-4 rounded-t">
-      <h1 class="text-xl font-bold">Admin Login</h1>
-    </div>
-    <div class="p-6">
-      <input type="password" id="adminPassword" placeholder="Enter Password" class="border p-3 rounded w-full mb-4 focus:outline-green-500">
-      <button id="loginBtn" class="bg-green-500 text-white p-3 rounded w-full hover:bg-green-600 flex justify-center items-center">
-        Login
-        <span id="loader" class="loader hidden"></span>
-      </button>
-      <p id="loginError" class="text-red-500 mt-2 hidden">Incorrect Password!</p>
-    </div>
+  <div class="overlay max-w-sm w-full text-center p-6">
+    <h1>Admin Login</h1>
+    <input type="password" id="adminPassword" placeholder="Enter Password" required>
+    <button id="loginBtn">
+      Login
+      <span id="loader" class="loader hidden"></span>
+    </button>
+    <p id="loginError" class="text-red-500 hidden">Incorrect Password!</p>
   </div>
 
   <script>
     const loginBtn = document.getElementById('loginBtn');
     const loginError = document.getElementById('loginError');
     const loader = document.getElementById('loader');
+
+    // Auto redirect if already logged in
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = 'adminPanel.html';
+    }
 
     loginBtn.addEventListener('click', async () => {
       loginError.classList.add('hidden');
@@ -75,6 +55,7 @@
             loginError.classList.remove('hidden');
           }
         }, 800);
+
       } catch (err) {
         loader.classList.add('hidden');
         loginBtn.disabled = false;
@@ -82,11 +63,6 @@
         loginError.classList.remove('hidden');
       }
     });
-
-    // Auto-redirect if already logged in
-    if (localStorage.getItem('adminLoggedIn') === 'true') {
-      window.location.href = 'adminPanel.html';
-    }
   </script>
 </body>
 </html>
