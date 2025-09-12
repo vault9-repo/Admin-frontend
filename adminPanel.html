@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - PrimePicks</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('background.PNG') no-repeat center center/cover;
+      background-size: cover;
+    }
+    .overlay {
+      background: rgba(255,255,255,0.95);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+  <div class="overlay max-w-4xl w-full p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4 text-center">Admin Panel - Predictions</h1>
+
+    <!-- Form -->
+    <form id="predictionForm" class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
+      <input type="date" id="date" class="border p-2 rounded" required>
+      <input type="time" id="time" class="border p-2 rounded" required>
+      <input type="text" id="match" placeholder="Match" class="border p-2 rounded" required>
+      <input type="text" id="prediction" placeholder="Prediction" class="border p-2 rounded" required>
+      <input type="text" id="odds" placeholder="Odds" class="border p-2 rounded" required>
+      <button type="submit" class="col-span-1 md:col-span-5 bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Add Prediction</button>
+    </form>
+
+    <!-- Table -->
+    <table class="w-full table-auto border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="border px-4 py-2">Date</th>
+          <th class="border px-4 py-2">Time</th>
+          <th class="border px-4 py-2">Match</th>
+          <th class="border px-4 py-2">Prediction</th>
+          <th class="border px-4 py-2">Odds</th>
+          <th class="border px-4 py-2">Action</th>
+        </tr>
+      </thead>
+      <tbody id="predictionsTable"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const apiUrl = 'http://localhost:5000/predictions';
+    const form = document.getElementById('predictionForm');
+    const table = document.getElementById('predictionsTable');
+
+    // Fetch predictions
+    async function fetchPredictions() {
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      table.innerHTML = data.map(bet => `
+        <tr class="text-center border">
+          <td class="border px-4 py-2">${bet.date}</td>
+          <td class="border px-4 py-2">${bet.time}</td>
+          <td class="border px-4 py-2">${bet.match}</td>
+          <td class="border px-4 py-2">${bet.prediction}</td>
+          <td class="border px-4 py-2">${bet.odds}</td>
+          <td class="border px-4 py-2">
+            <button onclick="deletePrediction('${bet._id}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Add prediction
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const bet = {
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        match: document.getElementById('match').value,
+        prediction: document.getElementById('prediction').value,
+        odds: document.getElementById('odds').value,
+      };
+      await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bet),
+      });
+      form.reset();
+      fetchPredictions();
+    });
+
+    // Delete prediction
+    async function deletePrediction(id) {
+      await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+      fetchPredictions();
+    }
+
+    // Initial fetch
+    fetchPredictions();
+  </script>
+
+</body>
+</html>
