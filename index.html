@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - PrimePicks</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+  <!-- Header -->
+  <header class="bg-green-600 text-white w-full py-4 text-center shadow">
+    <h1 class="text-2xl font-bold">PrimePicks Admin Panel</h1>
+  </header>
+
+  <!-- Form Section -->
+  <main class="flex flex-col items-center w-full max-w-3xl p-6">
+    <form id="predictionForm" class="bg-white p-6 rounded shadow w-full mb-8">
+      <h2 class="text-lg font-semibold mb-4">Add New Prediction</h2>
+
+      <div class="grid grid-cols-2 gap-4">
+        <input name="date" type="date" class="border p-2 rounded" required>
+        <input name="time" type="time" class="border p-2 rounded" required>
+        <input name="match" type="text" placeholder="Team A vs Team B" class="border p-2 rounded col-span-2" required>
+        <input name="prediction" type="text" placeholder="Prediction (e.g. Over 2.5)" class="border p-2 rounded col-span-2" required>
+        <input name="odds" type="text" placeholder="Odds (e.g. 1.85)" class="border p-2 rounded col-span-2" required>
+      </div>
+
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded mt-4 hover:bg-green-700">
+        Add Prediction
+      </button>
+    </form>
+
+    <!-- Table Section -->
+    <section class="bg-white p-6 rounded shadow w-full">
+      <h2 class="text-lg font-semibold mb-4">Stored Predictions</h2>
+      <table class="table-auto w-full border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border p-2">Date</th>
+            <th class="border p-2">Time</th>
+            <th class="border p-2">Match</th>
+            <th class="border p-2">Prediction</th>
+            <th class="border p-2">Odds</th>
+            <th class="border p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="predictionTableBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Import config + admin.js -->
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
