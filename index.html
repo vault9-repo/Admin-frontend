@@ -6,42 +6,35 @@
   <title>PrimePicks Admin Panel</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body style="background: url('./images/background.PNG') no-repeat center center/cover;">
 
-  <!-- ===== Login Section ===== -->
-  <section id="loginSection">
-    <div class="login-box">
-      <h2>🔑 Admin Login</h2>
-      <form id="loginForm">
-        <input type="password" id="password" placeholder="Enter Admin Password" required />
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  </section>
+  <!-- ===== LOGIN FORM ===== -->
+  <div id="login-form" class="card">
+    <h2>🔑 Admin Login</h2>
+    <form>
+      <input type="password" id="password" placeholder="Enter Admin Password" required />
+      <button type="submit">Login</button>
+    </form>
+  </div>
 
-  <!-- ===== Dashboard Section ===== -->
-  <section id="dashboardSection" style="display: none;">
-    <div class="dashboard-header">
-      <h1>📊 PrimePicks Admin Dashboard</h1>
-      <button id="logoutBtn" class="logout-btn">🚪 Logout</button>
-    </div>
+  <!-- ===== ADMIN PANEL ===== -->
+  <div id="admin-panel" class="card" style="display:none;">
+    <h2>📊 Manage Predictions</h2>
 
-    <!-- Add New Prediction -->
-    <form id="betForm" class="form-box">
+    <!-- Add Bet Form -->
+    <form id="bet-form">
       <input type="date" id="date" required />
       <input type="time" id="time" required />
-      <input type="text" id="match" placeholder="Team A vs Team B" required />
-      <input type="text" id="prediction" placeholder="Prediction (e.g. Over 2.5)" required />
-      <input type="text" id="odds" placeholder="Odds (e.g. 1.85)" required />
+      <input type="text" id="match" placeholder="Match (Team A vs Team B)" required />
+      <input type="text" id="prediction" placeholder="Prediction (e.g., Over 2.5)" required />
+      <input type="text" id="odds" placeholder="Odds (e.g., 1.95)" required />
       <button type="submit">➕ Add Prediction</button>
     </form>
 
-    <!-- Bets List -->
-    <div class="bets-container">
-      <h2>📋 Stored Predictions</h2>
-      <ul id="betsList"></ul>
-    </div>
-  </section>
+    <!-- Bet List -->
+    <h3>📋 Stored Predictions</h3>
+    <ul id="bet-list"></ul>
+  </div>
 
   <script src="admin.js"></script>
 </body>
