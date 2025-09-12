@@ -1,90 +1,119 @@
-import API_BASE_URL from "./config.js";
+const backendUrl = "https://your-backend.onrender.com"; // change to your Render backend URL
 
 document.addEventListener("DOMContentLoaded", () => {
-  const predictionForm = document.getElementById("predictionForm");
-  const predictionTableBody = document.getElementById("predictionTableBody");
+  const loginForm = document.getElementById("loginForm");
+  const passwordInput = document.getElementById("password");
+  const loginSection = document.getElementById("loginSection");
+  const dashboardSection = document.getElementById("dashboardSection");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  // ===== Fetch and display all predictions =====
-  async function loadPredictions() {
+  const betForm = document.getElementById("betForm");
+  const betsList = document.getElementById("betsList");
+
+  // ===== Login =====
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const password = passwordInput.value.trim();
+
     try {
-      const res = await fetch(`${API_BASE_URL}/predictions`);
+      const res = await fetch(`${backendUrl}/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
       const data = await res.json();
 
-      predictionTableBody.innerHTML = "";
-
-      data.forEach((bet) => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td class="border p-2">${bet.date}</td>
-          <td class="border p-2">${bet.time}</td>
-          <td class="border p-2">${bet.match}</td>
-          <td class="border p-2">${bet.prediction}</td>
-          <td class="border p-2">${bet.odds}</td>
-          <td class="border p-2 text-center">
-            <button 
-              class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              data-id="${bet._id}">
-              Delete
-            </button>
-          </td>
-        `;
-
-        predictionTableBody.appendChild(row);
-      });
+      if (data.success) {
+        loginSection.style.display = "none";
+        dashboardSection.style.display = "block";
+        loadBets();
+      } else {
+        alert(data.message || "Incorrect password!");
+      }
     } catch (err) {
-      console.error("❌ Error loading predictions:", err);
+      console.error("Login error:", err);
+      alert("Server error. Try again later.");
     }
-  }
+  });
 
-  // ===== Handle form submit =====
-  predictionForm.addEventListener("submit", async (e) => {
+  // ===== Logout =====
+  logoutBtn.addEventListener("click", () => {
+    dashboardSection.style.display = "none";
+    loginSection.style.display = "block";
+    passwordInput.value = "";
+  });
+
+  // ===== Add Bet =====
+  betForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(predictionForm);
-    const newPrediction = {
-      date: formData.get("date"),
-      time: formData.get("time"),
-      match: formData.get("match"),
-      prediction: formData.get("prediction"),
-      odds: formData.get("odds"),
+    const newBet = {
+      date: document.getElementById("date").value,
+      time: document.getElementById("time").value,
+      match: document.getElementById("match").value,
+      prediction: document.getElementById("prediction").value,
+      odds: document.getElementById("odds").value,
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/predictions`, {
+      const res = await fetch(`${backendUrl}/predictions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newPrediction),
+        body: JSON.stringify(newBet),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Prediction added!");
+        betForm.reset();
+        loadBets();
+      } else {
+        alert(data.message || "Error adding prediction");
+      }
+    } catch (err) {
+      console.error("Add bet error:", err);
+      alert("Server error. Try again later.");
+    }
+  });
+
+  // ===== Load Bets =====
+  async function loadBets() {
+    betsList.innerHTML = "";
+    try {
+      const res = await fetch(`${backendUrl}/predictions`);
+      const data = await res.json();
+
+      data.forEach((bet) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${bet.date} ${bet.time} - ${bet.match} | <strong>${bet.prediction}</strong> (odds: ${bet.odds})
+          <button data-id="${bet._id}">Delete</button>
+        `;
+        li.querySelector("button").addEventListener("click", () => deleteBet(bet._id));
+        betsList.appendChild(li);
+      });
+    } catch (err) {
+      console.error("Load bets error:", err);
+    }
+  }
+
+  // ===== Delete Bet =====
+  async function deleteBet(id) {
+    if (!confirm("Delete this prediction?")) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/predictions/${id}`, {
+        method: "DELETE",
       });
 
-      const data = await res.json();
-      console.log("✅ Added:", data);
-
-      predictionForm.reset();
-      loadPredictions();
-    } catch (err) {
-      console.error("❌ Error adding prediction:", err);
-    }
-  });
-
-  // ===== Handle delete =====
-  predictionTableBody.addEventListener("click", async (e) => {
-    if (e.target.tagName === "BUTTON") {
-      const id = e.target.getAttribute("data-id");
-
-      try {
-        await fetch(`${API_BASE_URL}/predictions/${id}`, {
-          method: "DELETE",
-        });
-
-        console.log("🗑️ Deleted:", id);
-        loadPredictions();
-      } catch (err) {
-        console.error("❌ Error deleting prediction:", err);
+      if (res.ok) {
+        alert("Prediction deleted!");
+        loadBets();
+      } else {
+        alert("Error deleting prediction");
       }
+    } catch (err) {
+      console.error("Delete bet error:", err);
     }
-  });
-
-  // Initial load
-  loadPredictions();
+  }
 });
