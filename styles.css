@@ -1,94 +1,113 @@
-/* General Layout */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  color: #fff;
-  background-size: cover;
-  background-attachment: fixed;
+  background: url('images/background.PNG') no-repeat center center/cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Container */
 .container {
+  width: 95%;
   max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
-  text-align: center;
 }
 
-/* Card Style */
 .card {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.95);
   padding: 20px;
-  margin: 20px 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
 }
 
-/* Headings */
-h1, h2 {
-  margin-bottom: 15px;
+h1 {
+  text-align: center;
+  color: #059669; /* Tailwind green-500 */
 }
 
-/* Form */
-form input {
-  display: block;
-  width: 90%;
-  margin: 10px auto;
+input, button {
+  width: 100%;
   padding: 10px;
-  border-radius: 6px;
-  border: none;
-}
-
-form button {
-  background: #28a745;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  color: white;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
   font-size: 16px;
+}
+
+button {
+  background-color: #059669;
+  color: white;
   cursor: pointer;
-  margin-top: 10px;
 }
 
-form button:hover {
-  background: #218838;
+button:hover {
+  background-color: #047857;
 }
 
-/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 th, td {
-  border: 1px solid #444;
-  padding: 10px;
+  border: 1px solid #ccc;
+  padding: 8px;
   text-align: center;
 }
 
 th {
-  background: #333;
+  background-color: #f3f4f6;
 }
 
-tr:nth-child(even) {
-  background: rgba(255,255,255,0.05);
-}
-
-tr:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-/* Action Button */
 .delete-btn {
-  background: #dc3545;
+  background-color: #ef4444;
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
   color: white;
+  padding: 5px 10px;
   cursor: pointer;
 }
 
 .delete-btn:hover {
-  background: #c82333;
+  background-color: #b91c1c;
+}
+
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #10B981;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-btn {
+  background-color: #ef4444;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #b91c1c;
 }

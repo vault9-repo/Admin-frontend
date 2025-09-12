@@ -22,7 +22,10 @@
 
     <!-- Admin Panel Card -->
     <div id="adminCard" class="card hidden">
-      <h1>Admin Panel - Predictions</h1>
+      <div class="panel-header">
+        <h1>Admin Panel - Predictions</h1>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
 
       <!-- Add Prediction Form -->
       <form id="predictionForm">
@@ -55,10 +58,11 @@
     const loginCard = document.getElementById('loginCard');
     const adminCard = document.getElementById('adminCard');
     const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const loader = document.getElementById('loader');
     const loginError = document.getElementById('loginError');
 
-    const apiUrl = 'https://admin-backend-7bsj.onrender.com'; // Replace with your backend URL
+    const apiUrl = 'https://admin-backend-7bsj.onrender.com'; // Backend URL
     const table = document.getElementById('predictionsTable');
     const form = document.getElementById('predictionForm');
 
@@ -96,6 +100,13 @@
         loginError.textContent = 'Server error, try again!';
         loginError.classList.remove('hidden');
       }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      adminCard.classList.add('hidden');
+      loginCard.classList.remove('hidden');
+      document.getElementById('adminPassword').value = '';
     });
 
     // Fetch Predictions
@@ -152,6 +163,5 @@
       }
     }
   </script>
-
 </body>
 </html>
