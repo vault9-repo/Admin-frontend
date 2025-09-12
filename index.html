@@ -4,118 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login - PrimePicks</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    /* Body & Background */
-    body {
-      font-family: 'Inter', sans-serif;
-      background: url('background.PNG') no-repeat center center/cover;
-      background-size: cover;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* Overlay container */
-    .overlay {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 1rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      transition: all 0.3s ease-in-out;
-    }
-
-    /* Header */
-    .overlay h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #10B981; /* Tailwind green-500 */
-      letter-spacing: 1px;
-    }
-
-    /* Inputs */
-    .overlay input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #D1D5DB;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-    .overlay input:focus {
-      outline: none;
-      border-color: #10B981;
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
-    }
-
-    /* Button */
-    .overlay button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #10B981;
-      color: white;
-      font-weight: 600;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .overlay button:hover {
-      background-color: #059669; /* Tailwind green-600 */
-    }
-
-    /* Loader */
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #10B981;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 8px;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
-
-    /* Error messages */
-    #loginError {
-      color: #DC2626;
-      font-weight: 500;
-      margin-top: 0.5rem;
-    }
-  </style>
+  <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <div class="overlay p-0">
-    <!-- Header -->
-    <div class="bg-green-500 text-white py-4 rounded-t">
-      <h1>Admin Login</h1>
-    </div>
 
-    <!-- Login Form -->
-    <div class="p-6">
-      <input type="password" id="adminPassword" placeholder="Enter Password">
-      <button id="loginBtn">
-        Login
-        <span id="loader" class="loader hidden"></span>
-      </button>
-      <p id="loginError" class="hidden">Incorrect Password!</p>
-    </div>
+  <div class="overlay max-w-sm w-full text-center p-6">
+    <h1>Admin Login</h1>
+    <input type="password" id="adminPassword" placeholder="Enter Password" required>
+    <button id="loginBtn">
+      Login
+      <span id="loader" class="loader hidden"></span>
+    </button>
+    <p id="loginError" class="text-red-500 hidden">Incorrect Password!</p>
   </div>
 
   <script>
     const loginBtn = document.getElementById('loginBtn');
     const loginError = document.getElementById('loginError');
     const loader = document.getElementById('loader');
+
+    // Auto redirect if already logged in
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = 'adminPanel.html';
+    }
 
     loginBtn.addEventListener('click', async () => {
       loginError.classList.add('hidden');
@@ -141,10 +52,10 @@
             localStorage.setItem('adminLoggedIn', 'true');
             window.location.href = 'adminPanel.html';
           } else {
-            loginError.textContent = data.message || 'Incorrect Password!';
             loginError.classList.remove('hidden');
           }
         }, 800);
+
       } catch (err) {
         loader.classList.add('hidden');
         loginBtn.disabled = false;
@@ -152,11 +63,6 @@
         loginError.classList.remove('hidden');
       }
     });
-
-    // Auto redirect if already logged in
-    if (localStorage.getItem('adminLoggedIn') === 'true') {
-      window.location.href = 'adminPanel.html';
-    }
   </script>
 </body>
 </html>
