@@ -1,5 +1,5 @@
 // ====== CONFIG ======
-const API_BASE = "https://admin-backend-7bsj.onrender.com"; // Replace with your actual Render backend URL
+const API_BASE = "https://admin-frontend-3b3e.onrender.com"; // 🔴 replace with your actual Render backend URL
 
 // ====== Elements ======
 const loginForm = document.getElementById("login-form");
@@ -39,7 +39,6 @@ async function loadBets() {
   betList.innerHTML = "";
   try {
     const res = await fetch(`${API_BASE}/predictions`);
-    if (!res.ok) throw new Error("Failed to fetch predictions");
     const bets = await res.json();
 
     bets.forEach((bet) => {
@@ -70,10 +69,6 @@ betForm.addEventListener("submit", async (e) => {
   const prediction = document.getElementById("prediction").value;
   const odds = document.getElementById("odds").value;
 
-  if (!date || !time || !match || !prediction || !odds) {
-    return alert("All fields are required");
-  }
-
   try {
     const res = await fetch(`${API_BASE}/predictions`, {
       method: "POST",
@@ -102,7 +97,6 @@ async function deleteBet(id) {
   try {
     const res = await fetch(`${API_BASE}/predictions/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
     });
 
     const data = await res.json();
