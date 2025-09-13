@@ -1,113 +1,82 @@
-// ====== CONFIG ======
-const API_BASE = "https://admin-backend-7bsj.onrender.com"; // 🔴 replace with your actual Render backend URL
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
 
-// ====== Elements ======
-const loginForm = document.getElementById("login-form");
-const adminPanel = document.getElementById("admin-panel");
-const betForm = document.getElementById("bet-form");
-const betList = document.getElementById("bet-list");
+dotenv.config();
 
-// ====== Admin Login ======
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const password = document.getElementById("password").value;
+const app = express();
+const PORT = process.env.PORT || 5000;
 
+// ===== Middleware =====
+app.use(cors());
+app.use(express.json());
+
+// ===== MongoDB Connection =====
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("✅ MongoDB connected"))
+.catch(err => console.error("❌ MongoDB connection error:", err));
+
+// ===== Prediction Schema =====
+const predictionSchema = new mongoose.Schema({
+  date: String,
+  time: String,
+  match: String,
+  prediction: String,
+  odds: String,
+}, { timestamps: true });
+
+const Prediction = mongoose.model("Prediction", predictionSchema, "predictions");
+
+// ===== Admin Login =====
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+
+app.post("/admin/login", (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    return res.json({ success: true });
+  }
+  res.status(401).json({ success: false, message: "Invalid password" });
+});
+
+// ===== Get Predictions =====
+app.get("/predictions", async (req, res) => {
   try {
-    const res = await fetch(`${API_BASE}/admin/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      loginForm.style.display = "none";
-      adminPanel.style.display = "block";
-      loadBets();
-    } else {
-      alert(data.message || "Login failed");
-    }
+    const predictions = await Prediction.find().sort({ createdAt: -1 });
+    res.json(predictions);
   } catch (err) {
-    console.error("❌ Login error:", err);
-    alert("Server error. Try again later.");
+    console.error(err);
+    res.status(500).json({ message: "Error fetching predictions" });
   }
 });
 
-// ====== Load Bets ======
-async function loadBets() {
-  betList.innerHTML = "";
+// ===== Add Prediction =====
+app.post("/predictions", async (req, res) => {
+  const { date, time, match, prediction, odds } = req.body;
   try {
-    const res = await fetch(`${API_BASE}/predictions`);
-    const bets = await res.json();
-
-    bets.forEach((bet) => {
-      const li = document.createElement("li");
-      li.textContent = `${bet.date} | ${bet.time} | ${bet.match} | ${bet.prediction} | Odds: ${bet.odds}`;
-
-      const delBtn = document.createElement("button");
-      delBtn.textContent = "Delete";
-      delBtn.classList.add("delete-btn");
-      delBtn.addEventListener("click", () => deleteBet(bet._id));
-
-      li.appendChild(delBtn);
-      betList.appendChild(li);
-    });
+    const newPrediction = new Prediction({ date, time, match, prediction, odds });
+    await newPrediction.save();
+    res.json({ message: "Prediction added successfully" });
   } catch (err) {
-    console.error("❌ Error loading bets:", err);
-    alert("Error fetching bets from server.");
-  }
-}
-
-// ====== Add Bet ======
-betForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const date = document.getElementById("date").value;
-  const time = document.getElementById("time").value;
-  const match = document.getElementById("match").value;
-  const prediction = document.getElementById("prediction").value;
-  const odds = document.getElementById("odds").value;
-
-  try {
-    const res = await fetch(`${API_BASE}/predictions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, time, match, prediction, odds }),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert("✅ Prediction added!");
-      betForm.reset();
-      loadBets();
-    } else {
-      alert(data.message || "Error adding prediction");
-    }
-  } catch (err) {
-    console.error("❌ Error adding bet:", err);
-    alert("Server error. Try again later.");
+    console.error(err);
+    res.status(500).json({ message: "Error adding prediction" });
   }
 });
 
-// ====== Delete Bet ======
-async function deleteBet(id) {
-  if (!confirm("Are you sure you want to delete this prediction?")) return;
-
+// ===== Delete Prediction =====
+app.delete("/predictions/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    const res = await fetch(`${API_BASE}/predictions/${id}`, {
-      method: "DELETE",
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert("🗑️ Prediction deleted");
-      loadBets();
-    } else {
-      alert(data.message || "Error deleting prediction");
-    }
+    await Prediction.findByIdAndDelete(id);
+    res.json({ message: "Prediction deleted successfully" });
   } catch (err) {
-    console.error("❌ Error deleting bet:", err);
-    alert("Server error. Try again later.");
+    console.error(err);
+    res.status(500).json({ message: "Error deleting prediction" });
   }
-}
+});
+
+// ===== Start Server =====
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
