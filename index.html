@@ -3,61 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PrimePicks Betting Tips</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css">
+  <title>Admin Login - PrimePicks</title>
+  <link href="styles.css" rel="stylesheet">
 </head>
-<body class="bg-black text-white" style="background:url('images/background.PNG') no-repeat center center/cover;background-size:cover;">
+<body>
 
-  <!-- Landing/Login/Register -->
-  <section id="landing" class="flex flex-col items-center justify-center min-h-screen p-6 bg-black bg-opacity-60">
-    <h1 class="text-4xl md:text-5xl font-bold text-center mb-6">PrimePicks Betting Tips Portal</h1>
-
-    <div id="auth-section" class="flex flex-col md:flex-row gap-3 items-center mb-6 w-full max-w-md">
-      <input type="email" id="email" placeholder="Email" class="flex-1 p-3 rounded-lg text-black"/>
-      <input type="password" id="password" placeholder="Password" class="flex-1 p-3 rounded-lg text-black"/>
-      <button id="register" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg">Register</button>
-      <button id="login" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">Login</button>
-    </div>
-
-    <!-- Subscription -->
-    <div id="subscription-section" class="hidden flex flex-col items-center gap-3 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-4">Subscribe to Access Predictions</h2>
-      <div class="flex flex-col md:flex-row gap-4 w-full justify-center">
-        <button class="plan bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg" data-type="daily">Daily - KES 50</button>
-        <button class="plan bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg" data-type="weekly">Weekly - KES 300</button>
-        <button class="plan bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg" data-type="monthly">Monthly - KES 600</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Predictions -->
-  <section id="predictions-section" class="hidden p-6">
-    <h2 class="text-3xl font-bold mb-4">Predictions</h2>
-    <ul id="predictions-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></ul>
-    <button id="logout" class="mt-6 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">Go Back Home</button>
-  </section>
-
-  <!-- Premium Results -->
-  <section id="premium-results" class="py-12 px-6">
-    <h2 class="text-3xl font-bold mb-6 text-center">⭐ Premium Results</h2>
-    <div id="results-slideshow" class="flex space-x-4 overflow-x-auto scroll-smooth">
-      <img src="images/view1.PNG" class="zoomable rounded-lg w-64 cursor-pointer flex-shrink-0">
-      <img src="images/view2.PNG" class="zoomable rounded-lg w-64 cursor-pointer flex-shrink-0">
-      <img src="images/news2.PNG" class="zoomable rounded-lg w-64 cursor-pointer flex-shrink-0">
-      <img src="images/news3.PNG" class="zoomable rounded-lg w-64 cursor-pointer flex-shrink-0">
-      <img src="images/news4.PNG" class="zoomable rounded-lg w-64 cursor-pointer flex-shrink-0">
-      <img src="images/news5.PNG" class="zoomable rounded-lg w-64 cursor-pointer flex-shrink-0">
-    </div>
-  </section>
-
-  <!-- Zoom Modal -->
-  <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-    <span id="closeModal" class="absolute top-4 right-6 text-white text-3xl cursor-pointer">&times;</span>
-    <img id="modalImage" class="max-w-[90%] max-h-[90%] rounded-lg shadow-lg">
+  <div class="overlay max-w-sm w-full text-center p-6">
+    <h1>Admin Login</h1>
+    <input type="password" id="adminPassword" placeholder="Enter Password" required>
+    <button id="loginBtn">
+      Login
+      <span id="loader" class="loader hidden"></span>
+    </button>
+    <p id="loginError" class="text-red-500 hidden">Incorrect Password!</p>
   </div>
 
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const loader = document.getElementById('loader');
+
+    // Auto redirect if already logged in
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = 'adminPanel.html';
+    }
+
+    loginBtn.addEventListener('click', async () => {
+      loginError.classList.add('hidden');
+      loader.classList.remove('hidden');
+      loginBtn.disabled = true;
+
+      const password = document.getElementById('adminPassword').value;
+
+      try {
+        const res = await fetch('https://admin-backend-7dt6.onrender.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await res.json();
+
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          loginBtn.disabled = false;
+
+          if (data.success) {
+            localStorage.setItem('adminLoggedIn', 'true');
+            window.location.href = 'adminPanel.html';
+          } else {
+            loginError.classList.remove('hidden');
+          }
+        }, 800);
+
+      } catch (err) {
+        loader.classList.add('hidden');
+        loginBtn.disabled = false;
+        loginError.textContent = "Server error, try again!";
+        loginError.classList.remove('hidden');
+      }
+    });
+  </script>
 </body>
 </html>
